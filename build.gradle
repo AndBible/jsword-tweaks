@@ -1,7 +1,7 @@
 apply plugin: "java"
 
 ext {
-    jsword_project = "../../jsword"
+    jsword_project = System.env.JSWORD_PATH ?: "../../jsword"
     jsword_src = "${jsword_project}/src/main/java"
     jsword_resources = "${jsword_project}/src/main/resources"
     tweaks_jsword_src = "tweaks-src/java"
@@ -10,7 +10,7 @@ ext {
     build_src = "src/jsword/java"
     build_resources = "src/jsword/resources"
     distribution = "distribution"
-    andbible = "../and-bible"
+    target_dir = System.env.TARGET_DIR ?: "../and-bible/app/libs"
     jswordtweaks_home = "$rootDir"
 }
 
@@ -63,7 +63,7 @@ task mergeCode(type: Copy, dependsOn: init) {
     outputs.upToDateWhen { false }
     from(jsword_src) {
         exclude("org/crosswire/jsword/book/install/sword/FTPExample.java")
-		exclude("org/crosswire/jsword/examples/Bench.java")
+        exclude("org/crosswire/jsword/examples/Bench.java")
     }
     from(tweaks_jsword_src){
         duplicatesStrategy DuplicatesStrategy.INCLUDE
@@ -89,6 +89,13 @@ clean.dependsOn clean_project, init
 compileJava.dependsOn mergeResources, mergeCode
 build.dependsOn compileJava, jar
 
+task install(type: Copy, dependsOn: build) {
+    from("build/libs/jsword-tweaks.jar") {
+        rename("jsword-tweaks.jar", "jsword.jar")
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+    }
+    into target_dir
+}
 
 repositories {
     mavenCentral()
@@ -102,5 +109,5 @@ dependencies {
     implementation "org.jdom:jdom2:2.0.6"
     implementation "org.apache.lucene:lucene-analyzers:3.1.0"
     implementation "org.apache.lucene:lucene-smartcn:3.1.0"
-	implementation "org.slf4j:slf4j-api:1.7.6"
+    implementation "org.slf4j:slf4j-api:1.7.6"
 }
