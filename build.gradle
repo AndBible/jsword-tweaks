@@ -84,14 +84,27 @@ sourceSets {
     }
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
 clean.dependsOn clean_project, init
 compileJava.dependsOn mergeResources, mergeCode
 build.dependsOn compileJava, jar
 
-task install(type: Copy, dependsOn: build) {
-    from("build/libs/jsword-tweaks.jar") {
+task installSources(type: Copy, dependsOn: build) {
+    from("build/libs/jsword-tweaks-sources.jar") {
+        rename("jsword-tweaks-sources.jar", "jsword-src.jar")
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+    }
+    into target_dir
+}
+
+task install(type: Copy, dependsOn: [build, installSources]) {
+    from("build/libs") {
         rename("jsword-tweaks.jar", "jsword.jar")
+        rename("jsword-tweaks-sources.jar", "jsword-src.jar")
         duplicatesStrategy DuplicatesStrategy.INCLUDE
     }
     into target_dir
