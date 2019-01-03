@@ -103,8 +103,8 @@ task installSources(type: Copy, dependsOn: build) {
 
 task install(type: Copy, dependsOn: [build, installSources]) {
     from("build/libs") {
-        rename("jsword-tweaks.jar", "jsword.jar")
-        rename("jsword-tweaks-sources.jar", "jsword-src.jar")
+        rename("${project.name}.jar", "jsword.jar")
+        rename("${project.name}-sources.jar", "jsword-src.jar")
         duplicatesStrategy DuplicatesStrategy.INCLUDE
     }
     into target_dir
