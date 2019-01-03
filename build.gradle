@@ -1,29 +1,33 @@
 apply plugin: "java"
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
 
 ext {
     jsword_project = "../../jsword"
     jsword_src = "${jsword_project}/src/main/java"
     jsword_resources = "${jsword_project}/src/main/resources"
-    tweaks_jsword_src = "src/main/java/jsword"
-    tweaks_jsword_resources = "src/main/resources"
+    tweaks_jsword_src = "tweaks-src/java"
+    tweaks_jsword_resources = "tweaks-src/resources"
     tweaks_util_src = "src/util/java"
     build_src = "src/jsword/java"
     build_resources = "src/jsword/resources"
     distribution = "distribution"
     andbible = "../and-bible"
-    build_class = "build"
     jswordtweaks_home = "$rootDir"
 }
 
+allprojects {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 task clean_project {
+    outputs.upToDateWhen { false }
     doFirst {
-        delete("${build_src}", "${distribution}")
+        delete(build_src, build_resources, distribution)
     }
 }
 
 task init() {
+    outputs.upToDateWhen { false }
     doFirst {
         mkdir build_src
         mkdir build_resources
@@ -32,39 +36,48 @@ task init() {
 }
 
 task mergeResources(type: Copy, dependsOn: init) {
-    from("${jsword_resources}") {
+    outputs.upToDateWhen { false }
+
+    from(jsword_resources) {
         exclude("org/crosswire/jsword/versification/**")
     }
-    from("${jsword_resources}") {
+    from(jsword_resources) {
         include("org/crosswire/jsword/versification/**")
         filter({String line -> if (line.contains('!zerosUnmapped')) '#!zerosUnmapped // commented out' else line})
     }
     // switch the Chinese localisation defaults around so default CN is simplified and TW is Traditional
-    from("${jsword_resources}") {
+    from(jsword_resources) {
         include("BibleNames_zh*.properties")
         rename("BibleNames_zh.properties", "BibleNames_zh_TW.properties")
         rename("BibleNames_zh_CN.properties", "BibleNames_zh.properties")
     }
-    into(build_resources)
+    from(tweaks_jsword_resources) {
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+    }
+
+    into build_resources
 }
 
+
 task mergeCode(type: Copy, dependsOn: init) {
-    from("${jsword_src}") {
+    outputs.upToDateWhen { false }
+    from(jsword_src) {
         exclude("org/crosswire/jsword/book/install/sword/FTPExample.java")
 		exclude("org/crosswire/jsword/examples/Bench.java")
     }
-    into(build_src)
+    from(tweaks_jsword_src){
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+    }
+    into build_src
 }
 
 
 sourceSets {
     main {
         java {
-            srcDir 'src/main/java'
             srcDir 'src/jsword/java'
         }
         resources {
-            srcDir 'src/main/resources'
             srcDir 'src/jsword/resources'
         }
         output.resourcesDir = "build/classes/main"
@@ -73,7 +86,8 @@ sourceSets {
 
 
 clean.dependsOn clean_project, init
-build.dependsOn mergeResources, mergeCode, compileJava, jar
+compileJava.dependsOn mergeResources, mergeCode
+build.dependsOn compileJava, jar
 
 
 repositories {
@@ -81,19 +95,12 @@ repositories {
 }
 
 dependencies {
-    implementation "org.apache.httpcomponents:httpcore:4.3.2"
-    implementation "org.apache.httpcomponents:httpclient:4.3.2"
-    implementation "javatar:javatar:2.5"
+    implementation "org.apache.httpcomponents:httpclient:4.3.5"
     implementation "org.apache.commons:commons-compress:1.12"
-    implementation "commons-logging:commons-logging:1.1.3"
-    implementation "commons-lang:commons-lang:2.5"
-    implementation "com.chenlb.mmseg4j:mmseg4j-all:1.8.6"
-    implementation "org.jdom:jdom2:2.0.5"
-    implementation "org.apache.lucene:lucene-core:3.0.3"
-    implementation "org.apache.lucene:lucene-analyzers:3.0.3"
-    implementation "org.apache.lucene:lucene-smartcn:3.0.3"
-    implementation "org.apache.lucene:lucene-snowball:3.0.3"
+    implementation "com.chenlb.mmseg4j:mmseg4j-analysis:1.8.6"
+
+    implementation "org.jdom:jdom2:2.0.6"
+    implementation "org.apache.lucene:lucene-analyzers:3.1.0"
+    implementation "org.apache.lucene:lucene-smartcn:3.1.0"
 	implementation "org.slf4j:slf4j-api:1.7.6"
-	implementation "org.slf4j:slf4j-jdk14:1.7.6"
-    testImplementation "junit:junit:4.11"
 }

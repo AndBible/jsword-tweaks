@@ -6,8 +6,8 @@
 	<property name="jsword.project" location="../../jsword"/>
 	<property name="jsword.src" location="${jsword.project}/src/main/java"/>
 	<property name="jsword.resources" location="${jsword.project}/src/main/resources"/>
-	<property name="tweaks.jsword.src" location="src/main/java/jsword"/>
-	<property name="tweaks.jsword.resources" location="src/main/resources"/>
+	<property name="tweaks.jsword.src" location="tweaks-src/java/"/>
+	<property name="tweaks.jsword.resources" location="tweaks-src/resources"/>
 	<property name="tweaks.util.src" location="src/util/java"/>
 	<property name="build.src" location="build/src" />
 	<property name="build.class" location="build/class" />
