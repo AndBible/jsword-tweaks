@@ -18,7 +18,6 @@
 	
 	<path id="classpath">
 		<fileset dir="${jsword-tweaks.home}/lib/jars" includes="*.jar"/>
-		<fileset dir="./libs" includes="*.jar"/>
 	</path>
 	
 	<target name="clean">
