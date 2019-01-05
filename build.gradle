@@ -85,13 +85,14 @@ sourceSets {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
+    outputs.upToDateWhen { false }
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 clean.dependsOn clean_project, init
 compileJava.dependsOn mergeResources, mergeCode
-build.dependsOn compileJava, jar
+build.dependsOn sourcesJar, compileJava, jar
 
 task installSources(type: Copy, dependsOn: build) {
     from("build/libs/jsword-tweaks-sources.jar") {
