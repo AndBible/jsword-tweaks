@@ -26,7 +26,7 @@ task clean_project {
     }
 }
 
-task init() {
+task myinit() {
     outputs.upToDateWhen { false }
     doFirst {
         mkdir build_src
@@ -35,7 +35,7 @@ task init() {
     }
 }
 
-task mergeResources(type: Copy, dependsOn: init) {
+task mergeResources(type: Copy, dependsOn: myinit) {
     outputs.upToDateWhen { false }
 
     from(jsword_resources) {
@@ -59,7 +59,7 @@ task mergeResources(type: Copy, dependsOn: init) {
 }
 
 
-task mergeCode(type: Copy, dependsOn: init) {
+task mergeCode(type: Copy, dependsOn: myinit) {
     outputs.upToDateWhen { false }
     from(jsword_src) {
         exclude("org/crosswire/jsword/book/install/sword/FTPExample.java")
@@ -90,7 +90,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-clean.dependsOn clean_project, init
+clean.dependsOn clean_project, myinit
 compileJava.dependsOn mergeResources, mergeCode
 build.dependsOn sourcesJar, compileJava, jar
 
