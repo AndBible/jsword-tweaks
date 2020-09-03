@@ -116,7 +116,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.apache.httpcomponents:httpclient:4.3.5"
+    implementation "org.apache.httpcomponents.client5:httpclient5:5.0.1"
     implementation "org.apache.commons:commons-compress:1.12"
     implementation "com.chenlb.mmseg4j:mmseg4j-analysis:1.8.6"
 
